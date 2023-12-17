@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "11415293402",
+    "project_id": "filmopedia-authentication",
+    "storage_bucket": "filmopedia-authentication.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:11415293402:android:34214d66a38bf8207084e3",
+        "android_client_info": {
+          "package_name": "com.example.filmopedia"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSw9W-4U4QbpLrsv9L7PaJEP33ZTShgkk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

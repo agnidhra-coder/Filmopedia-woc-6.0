@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Filmopedia</string>
+    <string name="login">Login</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="register">Register</string>
+    <string name="register_now">Register Now</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="new_user">New User?</string>
+    <string name="sign_in">Sign In</string>
+    <string name="wishlist">Wishlist</string>
+    <string name="home">Home</string>
+</resources>

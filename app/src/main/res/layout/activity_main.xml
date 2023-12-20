@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="@color/darkBlue">
 
     <FrameLayout
         android:id="@+id/frame_layout"
@@ -21,6 +22,13 @@
         android:id="@+id/bottomNavigationView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:background="@drawable/bottom_nav_shape"
+        app:menu="@menu/bottom_nav"
+        app:itemIconSize="25dp"
+        app:itemIconTint="@drawable/item_selector"
+        app:itemActiveIndicatorStyle="@color/midBlue"
+        app:itemRippleColor="@color/darkBlue"
+        app:labelVisibilityMode="unlabeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

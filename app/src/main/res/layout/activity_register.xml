@@ -8,6 +8,7 @@
     android:layout_marginRight="25sp"
     android:gravity="center"
     android:orientation="vertical"
+    style="@style/screenBackground"
     tools:context=".Register">
 
 <!--    Register-->

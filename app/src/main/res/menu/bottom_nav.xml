@@ -8,9 +8,15 @@
         android:icon="@drawable/baseline_home_24"
         android:title="@string/home" />
     <item
+        android:id="@+id/search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@drawable/icons8_search"
+        android:title="@string/search" />
+    <item
         android:id="@+id/wishlist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:icon="@drawable/baseline_dehaze_24"
-        android:title="@string/wishlist" />
+        android:title="@string/saved" />
 </menu>

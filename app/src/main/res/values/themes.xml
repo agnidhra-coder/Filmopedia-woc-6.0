@@ -7,4 +7,9 @@
 
     <style name="Theme.Filmopedia" parent="Base.Theme.Filmopedia" />
     <style name="screenBackground"><item name="android:background">@color/white</item></style>
+    <style name="buttonStyle">
+        <item name="android:background">@color/lightBlue</item>
+        <item name="android:textColor">@color/midBlue</item>
+    </style>
+    <style name="textColor"><item name="android:textColor">@color/darkGrey</item></style>
 </resources>

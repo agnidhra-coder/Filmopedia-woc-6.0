@@ -51,6 +51,11 @@ dependencies {
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     //gson
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    //glide
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
+    //shimmer
+    implementation ("com.facebook.shimmer:shimmer:0.5.0@aar")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

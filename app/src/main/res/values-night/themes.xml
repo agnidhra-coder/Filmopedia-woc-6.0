@@ -3,12 +3,17 @@
     <style name="Base.Theme.Filmopedia" parent="Theme.AppCompat.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimaryDark">@color/darkGrey</item> <!-- used to set the status bar color -->
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     </style>
     
-    <style name="screenBackground"><item name="android:background">@color/darkBlue</item></style>
+    <style name="screenBackground"><item name="android:background">@drawable/main</item></style>
+    <style name="loginBackground"><item name="android:background">@drawable/sign_in_drk</item></style>
+    <style name="registerBackground"><item name="android:background">@drawable/sign_up_drk</item></style>
+    <style name="cardBackground"><item name="android:background">#0C0D0E</item></style>
     <style name="buttonStyle">
         <item name="android:background">@color/lightBlue</item>
         <item name="android:textColor">@color/midBlue</item>
     </style>
-    <style name="textColor"><item name="android:textColor">@color/lightBlue</item></style>
+    <style name="textColor"><item name="android:textColor">@color/white</item></style>
 </resources>

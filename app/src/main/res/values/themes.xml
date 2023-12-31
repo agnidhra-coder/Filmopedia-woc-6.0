@@ -3,13 +3,22 @@
     <style name="Base.Theme.Filmopedia" parent="Theme.AppCompat.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimaryDark">@color/white</item> <!-- used to change the color of status bar-->
+        <item name="android:windowLightStatusBar">true</item> <!-- used to change the color of status bar icons to grey -->
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     </style>
 
     <style name="Theme.Filmopedia" parent="Base.Theme.Filmopedia" />
-    <style name="screenBackground"><item name="android:background">@color/white</item></style>
+<!--    <style name="screenBackground"><item name="android:background">@color/white</item></style>-->
+    <style name="loginBackground"><item name="android:background">@drawable/sign_in_lt</item></style>
+    <style name="registerBackground"><item name="android:background">@drawable/sign_up_lt</item></style>
     <style name="buttonStyle">
         <item name="android:background">@color/lightBlue</item>
         <item name="android:textColor">@color/midBlue</item>
     </style>
-    <style name="textColor"><item name="android:textColor">@color/darkGrey</item></style>
+    <style name="textColor"><item name="android:textColor">@color/white</item></style>
+    <style name="roundedCorner">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">10dp</item>
+    </style>
 </resources>

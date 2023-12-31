@@ -8,7 +8,7 @@
     android:layout_marginRight="25sp"
     android:gravity="center"
     android:orientation="vertical"
-    style="@style/screenBackground"
+    style="@style/registerBackground"
     tools:context=".Register">
 
 <!--    Register-->
@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="15sp"
-            android:layout_weight="1"
+            android:fontFamily="@font/montserrat_bold"
             android:text="@string/register"
             android:textAlignment="textStart"
             android:textSize="25sp"
@@ -52,7 +52,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/first_name"
-                style="@style/textColor"/>
+                android:fontFamily="@font/montserrat"
+                style="@style/textColor"
+                android:singleLine="true"
+                android:imeOptions="actionNext"/>
         </com.google.android.material.textfield.TextInputLayout>
 
 <!--        Last Name-->
@@ -67,7 +70,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/last_name"
-                style="@style/textColor"/>
+                android:fontFamily="@font/montserrat"
+                style="@style/textColor"
+                android:singleLine="true"
+                android:imeOptions="actionNext"/>
         </com.google.android.material.textfield.TextInputLayout>
 
 <!--        Email-->
@@ -81,7 +87,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/email"
-                style="@style/textColor"/>
+                android:fontFamily="@font/montserrat"
+                android:singleLine="true"
+                style="@style/textColor"
+                android:imeOptions="actionNext"/>
         </com.google.android.material.textfield.TextInputLayout>
 
 <!--        Password-->
@@ -96,8 +105,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/password"
+                android:fontFamily="@font/montserrat"
                 style="@style/textColor"
-                android:inputType="textPassword"/>
+                android:inputType="textPassword"
+                android:singleLine="true"
+                android:imeOptions="actionNext"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -114,19 +126,24 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/confirm_password"
+                android:fontFamily="@font/montserrat"
                 style="@style/textColor"
-                android:inputType="textPassword"/>
+                android:inputType="textPassword"
+                android:singleLine="true"
+                android:imeOptions="actionDone"/>
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
 
     <Button
         android:id="@+id/btnRegister"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_marginHorizontal="70dp"
         android:layout_height="wrap_content"
-        android:text="@string/register_now"
-        style="@style/buttonStyle"
-
+        android:text="@string/register"
+        android:textSize="15dp"
+        android:fontFamily="@font/montserrat_bold"
+        android:background="@drawable/rounded_button_corner"
         app:cornerRadius="5sp" />
 
 <!--    Already a user-->

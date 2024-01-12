@@ -28,7 +28,7 @@
         app:itemIconSize="25dp"
         app:itemIconTint="@drawable/item_selector"
         app:itemActiveIndicatorStyle="@color/midBlue"
-        app:itemRippleColor="@color/darkBlue"
+        app:itemRippleColor="@color/darkerBlue"
         app:labelVisibilityMode="unlabeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -17,7 +17,9 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         val bottomView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
 
-        replaceWithFragment(Home())
+        supportFragmentManager.beginTransaction()
+            .add(R.id.frameLayout,Home())
+            .commit()
 
         bottomView.setOnItemSelectedListener {
             when(it.itemId){

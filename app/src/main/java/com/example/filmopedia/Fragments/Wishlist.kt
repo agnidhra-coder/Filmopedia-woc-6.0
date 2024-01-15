@@ -5,56 +5,95 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.filmopedia.Adapters.MoviesAdapter
+import com.example.filmopedia.Adapters.WishlistAdapter
+import com.example.filmopedia.Adapters.movieId
 import com.example.filmopedia.R
+import com.example.filmopedia.SwipeGesture
+import com.example.filmopedia.wishlistData.MovieDetails
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.getValue
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [Wishlist.newInstance] factory method to
- * create an instance of this fragment.
- */
+@Suppress("DEPRECATION")
 class Wishlist : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var recyclerView: RecyclerView
+    private var dbRef = FirebaseDatabase.getInstance().getReference("Favourites")
+    private var auth = FirebaseAuth.getInstance()
+    private lateinit var adapter : WishlistAdapter
+    private var uid = auth.currentUser?.uid.toString()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
+
         return inflater.inflate(R.layout.fragment_wishlist, container, false)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment Wishlist.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            Wishlist().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        recyclerView = view.findViewById(R.id.wishlistRV)
+        val mlist = mutableListOf<MovieDetails>()
+        adapter = WishlistAdapter(requireContext(), mlist)
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(context)
+
+
+        dbRef.child(uid).addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(snapshot.exists()){
+                    for(movieSnapshot in snapshot.children){
+                        val movies = movieSnapshot.getValue(MovieDetails::class.java)
+                        if(movies != null){
+                            if(!mlist.contains(movies)){
+                                mlist.add(movies)
+                            }
+                        }
+                    }
                 }
+                adapter.notifyDataSetChanged()
             }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(context, error.message, Toast.LENGTH_SHORT).show()
+            }
+        })
+
+
+        val swipeGesture = object : SwipeGesture(requireContext()){
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                when(direction){
+                    ItemTouchHelper.LEFT -> {
+                        adapter.deleteItem(viewHolder.adapterPosition)
+                        dbRef.child(uid).child(movieId).removeValue().addOnSuccessListener {
+                            Toast.makeText(context, "Removed from Wishlist", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    ItemTouchHelper.RIGHT -> {
+                        adapter.deleteItem(viewHolder.adapterPosition)
+                        dbRef.child(uid).child(movieId).removeValue().addOnSuccessListener {
+                            Toast.makeText(context, "Removed from Wishlist", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+
+            }
+        }
+
+        val touchHelper = ItemTouchHelper(swipeGesture)
+        touchHelper.attachToRecyclerView(recyclerView)
+
     }
+
+
 }

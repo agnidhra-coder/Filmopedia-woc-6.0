@@ -24,10 +24,6 @@ class Search : Fragment() {
     private lateinit var manager: RequestManager
     private lateinit var progress: ProgressDialog
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

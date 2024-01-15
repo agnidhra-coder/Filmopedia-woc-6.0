@@ -5,9 +5,25 @@
     android:layout_height="match_parent"
     tools:context=".Fragments.Wishlist">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/wishlist" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/wishlist"
+            android:fontFamily="@font/montserrat_bold"
+            android:textStyle="bold"
+            android:textSize="27dp"
+            style="@style/textColor" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/wishlistRV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
 
 </FrameLayout>

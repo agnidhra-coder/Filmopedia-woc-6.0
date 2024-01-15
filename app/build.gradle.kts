@@ -57,6 +57,8 @@ dependencies {
     annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
     //shimmer
     implementation ("com.facebook.shimmer:shimmer:0.5.0@aar")
+    // rv swipeDecorator
+    implementation ("it.xabaras.android:recyclerview-swipedecorator:1.4")
 
 
     testImplementation("junit:junit:4.13.2")

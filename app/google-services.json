@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "11415293402",
+    "firebase_url": "https://filmopedia-authentication-default-rtdb.firebaseio.com",
     "project_id": "filmopedia-authentication",
     "storage_bucket": "filmopedia-authentication.appspot.com"
   },

@@ -8,20 +8,21 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import com.example.filmopedia.databinding.ActivityLoginBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 class Login : AppCompatActivity() {
 
     private lateinit var binding:ActivityLoginBinding
-    private lateinit var firebaseAuth: FirebaseAuth
+    private var firebaseAuth = FirebaseAuth.getInstance()
+    private var uid = firebaseAuth.currentUser?.uid.toString()
+    private var dbRef = FirebaseDatabase.getInstance().getReference("Favourites")
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        firebaseAuth = FirebaseAuth.getInstance()
 
         binding.registerText.setOnClickListener {
             val intent = Intent(this, Register::class.java)

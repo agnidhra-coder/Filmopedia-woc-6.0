@@ -1,92 +1,265 @@
 package com.example.filmopedia.Adapters
 
 import android.content.Context
+import android.util.Log
+import android.util.SparseBooleanArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
-import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.filmopedia.Fragments.Wishlist
 import com.example.filmopedia.R
 import com.example.filmopedia.RapidAPIData.Result
-import com.example.filmopedia.interfaces.ItemClickListener
+import com.example.filmopedia.interfaces.MovieClickListener
 import com.example.filmopedia.wishlistData.MovieDetails
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+
 
 lateinit var movieId: String
-class MoviesAdapter(val context : Context, val popMoviesList : List<Result>) :
-RecyclerView.Adapter<MoviesAdapter.movieViewHolder>(){
+class MoviesAdapter(
+    val context: Context, val popMoviesList: List<Result>, var wishlist: ArrayList<MovieDetails>
+//                    val onMovieClicked: () -> Unit
+)
+    : RecyclerView.Adapter<MoviesAdapter.movieViewHolder>(){
 
-    private lateinit var movieListener : ItemClickListener
+    private lateinit var movieListener : MovieClickListener
+//    private lateinit var movieId: String
+    private val mcontext:Context
     private var db = FirebaseDatabase.getInstance()
     private var dbRef = db.getReference("Favourites")
     private var auth = FirebaseAuth.getInstance()
     private var uid = auth.currentUser?.uid.toString()
+    private val BTN_CHECKED = "btnChecked"
+    private var itemStateArray = SparseBooleanArray()
 
-    fun setOnItemClickListener(listener : ItemClickListener){
+    init {
+        this.mcontext=context
+    }
+    fun setOnMovieClickListener(listener : MovieClickListener){
         movieListener = listener
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): movieViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.each_movies_item, parent, false)
+        val itemView = LayoutInflater.from(mcontext).inflate(R.layout.each_movies_item, parent, false)
         return movieViewHolder(itemView, movieListener)
     }
 
 
     override fun onBindViewHolder(holder: movieViewHolder, position: Int) {
         try {
+//            val sharedPreferences = context.getSharedPreferences(BTN_CHECKED, Context.MODE_PRIVATE)
+//            val editor = sharedPreferences.edit()
+//            val checkedList = mutableListOf<String>()
+//            val wishMovies = MovieDetails().movieTitle
+//            for (movies in wishMovies!!){
+//                checkedList.add(movies)
+//            }
             val currentItem = popMoviesList[position]
-            holder.movieTitle.text = currentItem.titleText.text
 
+//            val isBtnChecked = sharedPreferences.getBoolean("checked", false)
+//            holder.wishBtn.isChecked = isBtnChecked
+
+//            if (itemStateArray.get(position, false)) {
+//                holder.wishBtn.isChecked = false
+//            }
+            Log.i("delCheck", wishlist.size.toString())
+            var isWishList:Boolean = false
+
+            for(item in wishlist)
+            {
+                if(item.id == currentItem.id)
+                {
+                    Log.i("checker",item.id.toString())
+                    isWishList = true
+                    break
+                }
+            }
+            holder.wishBtn.isChecked = isWishList
+            holder.movieTitle.text = currentItem.titleText.text
+            holder.movieID.text = currentItem.id
             movieId = currentItem.id
             val movieName = currentItem.titleText.text
             val moviePoster = currentItem.primaryImage.url
             val releaseYear = currentItem.releaseYear.year
-            holder.wishBtn.setOnCheckedChangeListener { buttonView, isChecked ->
-                if(isChecked){
-                    val movie = MovieDetails(movieId, moviePoster, movieName, releaseYear)
-                    dbRef.child(uid).child(movieId).setValue(movie).addOnSuccessListener {
-                        Toast.makeText(context, "Added to Wishlist", Toast.LENGTH_SHORT).show()
-                    }
 
+            holder.wishBtn.setOnClickListener {
+
+                val randomId = popMoviesList[position].id
+                if(holder.wishBtn.isChecked){
+                    holder.wishBtn.isChecked=true
+
+
+                    val movie = MovieDetails(randomId, moviePoster, movieName, releaseYear)
+                    wishlist.add(movie)
+                    dbRef.child(uid).child(randomId).setValue(movie).addOnSuccessListener {
+                        Toast.makeText(mcontext, "Added to Wishlist", Toast.LENGTH_SHORT).show()
+                        holder.wishBtn.isChecked=true
+                    }
                 } else{
-                    dbRef.child(uid).child(movieId).removeValue().addOnSuccessListener {
-                        Toast.makeText(context, "Removed from Wishlist", Toast.LENGTH_SHORT).show()
+//                    itemStateArray.put(position, false);
+
+                    //Log.i("delCheck",wishlist.size.toString())
+                    holder.wishBtn.isChecked=false
+                    val list = arrayListOf<MovieDetails>()
+                    for(item in wishlist){
+                        if(item.id!=randomId)
+                            list.add(item)
+                        else
+                            Log.i("deleteCheck","This item was removed: ${item.id}")
+                    }
+                    wishlist=list
+                    //Log.i("delCheck",wishlist.size.toString())
+
+                    dbRef.child(uid).child(randomId).removeValue().addOnSuccessListener {
+                        Toast.makeText(mcontext, "Removed from Wishlist $randomId", Toast.LENGTH_SHORT).show()
+
+                        notifyDataSetChanged()
                     }
                 }
+
+
+            }
+            holder.wishBtn.setOnCheckedChangeListener { buttonView, isChecked ->
+               /* val randomId = popMoviesList[position].id
+
+                if(isChecked){
+
+
+                    val movie = MovieDetails(randomId, moviePoster, movieName, releaseYear)
+
+                    val mlist = arrayListOf<MovieDetails>()
+                    dbRef.child(uid).addValueEventListener(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            if (context != null) {
+                                if (snapshot.exists()) {
+
+
+                                    for (movieSnapshot in snapshot.children) {
+                                        val movies =
+                                            movieSnapshot.getValue(MovieDetails::class.java)
+                                        if (movies != null) {
+                                            if (!mlist.contains(movies)) {
+                                                mlist.add(movies)
+                                            }
+                                        }
+                                    }
+                                }
+                                //here
+                                var isAdded =false
+                                for(item in mlist)
+                                {
+                                    if(item.id==movie.id)
+                                    {
+                                        isAdded=true
+                                        break
+                                    }
+                                }
+                                if(!isAdded) {
+                                    dbRef.child(uid).child(randomId).setValue(movie)
+                                        .addOnSuccessListener {
+                                            Toast.makeText(
+                                                mcontext,
+                                                "Added to Wishlist",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                }
+                            }
+
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+
+                        }
+                    })
+
+
+                } else{
+
+                    dbRef.child(uid).child(randomId).removeValue().addOnSuccessListener {
+                        Toast.makeText(mcontext, "Removed from Wishlist $randomId", Toast.LENGTH_SHORT).show()
+                    }
+                }*/
             }
 
             val url = currentItem.primaryImage.url
-            Glide.with(context)
+            Glide.with(mcontext)
                 .load(url)
                 .placeholder(R.drawable.placeholder)
+                .error(R.drawable.placeholder)
                 .into(holder.moviePoster)
             
         } catch (e: Exception){
-            Toast.makeText(context, "No movie found", Toast.LENGTH_SHORT).show()}
+//            Toast.makeText(mcontext, "No movie found", Toast.LENGTH_SHORT).show()
+            {}
+        }
     }
+    fun reloadWishList()
+    {
+        val mlist = arrayListOf<MovieDetails>()
+        dbRef.child(uid).addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (context != null) {
+                    if (snapshot.exists()) {
+
+
+                        for (movieSnapshot in snapshot.children) {
+                            val movies =
+                                movieSnapshot.getValue(MovieDetails::class.java)
+                            if (movies != null) {
+                                if (!mlist.contains(movies)) {
+                                    mlist.add(movies)
+                                }
+                            }
+                        }
+                    }
+                    wishlist = mlist
+
+                }
+
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        })
+    }
+
+
+
 
     override fun getItemCount(): Int {
         return popMoviesList.size
     }
 
-    class movieViewHolder(val itemView : View, listener: ItemClickListener) : RecyclerView.ViewHolder(itemView) {
+
+
+    class movieViewHolder(val itemView : View
+    , listener: MovieClickListener
+    )
+        : RecyclerView.ViewHolder(itemView) {
 
         var movieTitle : TextView
         var moviePoster : ShapeableImageView
         var wishBtn : CheckBox
+        var movieID : TextView
 
         init {
             movieTitle = itemView.findViewById(R.id.movieTitle)
             moviePoster = itemView.findViewById(R.id.moviePoster)
+            movieID = itemView.findViewById(R.id.movieID)
             wishBtn = itemView.findViewById(R.id.wishlist_btn)
+
             itemView.setOnClickListener {
-                listener.onItemClick(adapterPosition)
+                listener.onMovieClicked(adapterPosition)
             }
         }
     }

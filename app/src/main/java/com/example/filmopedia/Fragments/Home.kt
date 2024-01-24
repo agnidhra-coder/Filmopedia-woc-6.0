@@ -1,27 +1,44 @@
 package com.example.filmopedia.Fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.CheckBox
+import android.widget.ImageButton
+import android.widget.PopupMenu
 import android.widget.Spinner
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.filmopedia.About
 import com.example.filmopedia.interfaces.MovieApiInterface
 import com.example.filmopedia.Adapters.MoviesAdapter
+import com.example.filmopedia.Adapters.WishlistAdapter
+import com.example.filmopedia.Login
 import com.example.filmopedia.R
 import com.example.filmopedia.RapidAPIData.SearchData
 import com.example.filmopedia.RapidAPIData.genres.Genres
 import com.example.filmopedia.interfaces.GenreInterface
 import com.example.filmopedia.interfaces.GenreListInterface
-import com.example.filmopedia.interfaces.ItemClickListener
+import com.example.filmopedia.interfaces.MovieClickListener
+import com.example.filmopedia.wishlistData.MovieDetails
+import com.example.filmopedia.wishlistData.movieList
 import com.facebook.shimmer.ShimmerFrameLayout
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.getValue
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -31,19 +48,22 @@ import retrofit2.converter.gson.GsonConverterFactory
 @Suppress("DEPRECATION")
 class Home : Fragment(), AdapterView.OnItemSelectedListener {
 
+    lateinit var movieClickListener : MovieClickListener
     lateinit var popView: RecyclerView
     lateinit var filterView: RecyclerView
     lateinit var popMoviesAdapter: MoviesAdapter
     lateinit var genreDropdown: Spinner
+    lateinit var imgButton : ImageButton
+    private var dbRef = FirebaseDatabase.getInstance().getReference("Favourites")
+    private var auth = FirebaseAuth.getInstance()
+    private var uid = auth.currentUser?.uid.toString()
+    private lateinit var SHARED_PREFS : String
     private val baseUrl = "https://moviesdatabase.p.rapidapi.com/"
     val retrofitBuilder = Retrofit.Builder()
         .baseUrl(baseUrl)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,36 +75,114 @@ class Home : Fragment(), AdapterView.OnItemSelectedListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        SHARED_PREFS = "sharedPrefs"
         val popShimmerFrameLayout = view.findViewById<ShimmerFrameLayout>(R.id.shimmerView)
         popShimmerFrameLayout.startShimmer()
 
         popView = view.findViewById(R.id.popMoviesRecyclerView)
         filterView = view.findViewById(R.id.filterMoviesRecyclerView)
 
+        imgButton = view.findViewById(R.id.moreOptions)
+        imgButton.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                showPopupMenu(v)
+            }
+        })
+
         val rapidRetrofitData = retrofitBuilder
                                 .create(MovieApiInterface::class.java)
                                 .getPopularData()
 
+        val cardView = view.findViewById<CardView>(R.id.popCardView)
+
         rapidRetrofitData.enqueue(object : Callback<SearchData?> {
             override fun onResponse(call: Call<SearchData?>, response: Response<SearchData?>) {
                 // if api call is success, use data from API in app
-                val responseBody = response.body()
-                val resultList = responseBody?.results!!
+                try{
 
-                popShimmerFrameLayout.stopShimmer()
-                popShimmerFrameLayout.isVisible = false
+                    if(context!=null) {
+                        val responseBody = response.body()
+                        val resultList = responseBody?.results!!
 
-                //recyclerview
-                popMoviesAdapter = MoviesAdapter(context!!, resultList)
-                popView.adapter = popMoviesAdapter
-                popMoviesAdapter.setOnItemClickListener(object: ItemClickListener{
-                    override fun onItemClick(position: Int) {
-                        val bottomSheetFragment = BottomSheet()
-                        bottomSheetFragment.show(fragmentManager!!, bottomSheetFragment.tag)
-                    }
-                })
-                popView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+
+                        /*dbRef.child(uid).get().addOnSuccessListener { snapshot ->
+                            val wishlist = snapshot.getValue(movieList::class.java)
+                            Log.i("Wishlist",)*/
+                        val mlist = arrayListOf<MovieDetails>()
+                        dbRef.child(uid).addValueEventListener(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                if(context!=null){
+                                if (snapshot.exists()) {
+
+
+                                    for (movieSnapshot in snapshot.children) {
+                                        val movies =
+                                            movieSnapshot.getValue(MovieDetails::class.java)
+                                        if (movies != null) {
+                                            if (!mlist.contains(movies)) {
+                                                mlist.add(movies)
+                                            }
+                                        }
+                                    }
+                                }
+
+
+                                popShimmerFrameLayout.stopShimmer()
+                                popShimmerFrameLayout.isVisible = false
+
+                                //recyclerview
+                                popMoviesAdapter =
+                                    MoviesAdapter(requireContext(), resultList, mlist)
+                                popView.adapter = popMoviesAdapter
+
+                                popMoviesAdapter.setOnMovieClickListener(object :
+                                    MovieClickListener {
+                                    override fun onMovieClicked(position: Int) {
+                                        val bottomSheetFragment = BottomSheet()
+                                        bottomSheetFragment.show(
+                                            fragmentManager!!,
+                                            bottomSheetFragment.tag
+                                        )
+                                        val bundle = Bundle()
+                                        bundle.putString(
+                                            "title",
+                                            resultList[position].titleText.text
+                                        )
+                                        bundle.putString(
+                                            "year",
+                                            resultList[position].releaseYear.year.toString()
+                                        )
+                                        bundle.putString(
+                                            "poster",
+                                            resultList[position].primaryImage.url
+                                        )
+                                        parentFragmentManager.setFragmentResult(
+                                            "dataFromAdapter",
+                                            bundle
+                                        )
+                                    }
+                                })
+                                //here
+                            }
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+                                Toast.makeText(context, error.message, Toast.LENGTH_SHORT).show()
+                            }
+                        })
+
+
+
+                        }
+                            popView.layoutManager =
+                                LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+
+
+            }
+                catch (e:Exception)
+                {
+                    Log.i("runCheck",e.toString())
+                }
             }
 
             override fun onFailure(call: Call<SearchData?>, t: Throwable) {
@@ -99,9 +197,27 @@ class Home : Fragment(), AdapterView.OnItemSelectedListener {
                     .create(GenreListInterface::class.java)
                     .getGenres()
         genres.enqueue(object : Callback<Genres?> {
+
             override fun onResponse(call: Call<Genres?>, response: Response<Genres?>) {
-                val genreListAdapter  = ArrayAdapter(context!!, R.layout.filter_item, response.body()?.results!!)
-                genreDropdown.adapter = genreListAdapter
+                if(context!=null) {
+                    if (response.body()?.results != null) {
+                        val list =response.body()!!.results
+                        var newList= arrayListOf<String>()
+                        for((index,item) in list.withIndex()){
+                            if(index!=0)
+                                newList.add(item)
+                        }
+                        val genreListAdapter = ArrayAdapter(
+                            requireContext(),
+                            R.layout.filter_item,
+                            newList
+
+                        )
+                        genreDropdown.adapter = genreListAdapter
+                    } else {
+                        Log.d("home fragment", response.errorBody().toString())
+                    }
+                }
             }
 
             override fun onFailure(call: Call<Genres?>, t: Throwable) {
@@ -125,22 +241,75 @@ class Home : Fragment(), AdapterView.OnItemSelectedListener {
             override fun onResponse(call: Call<SearchData?>, response: Response<SearchData?>) {
 //                filterShimmerFrameLayout.stopShimmer()
 //                filterShimmerFrameLayout.isVisible = false
+                if(context!=null) {
+                    val responseBody = response.body()
+                    val resultList = responseBody?.results!!
 
-                val responseBody = response.body()
-                val resultList = responseBody?.results!!
-
-                val moviesAdapter = MoviesAdapter(context!!, resultList)
-                filterView.adapter = moviesAdapter
-                filterView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+                    val moviesAdapter = MoviesAdapter(requireContext(), resultList, arrayListOf())
+                    filterView.adapter = moviesAdapter
+                    moviesAdapter.setOnMovieClickListener(object : MovieClickListener {
+                        override fun onMovieClicked(position: Int) {
+                            val bottomSheetFragment = BottomSheet()
+                            bottomSheetFragment.show(fragmentManager!!, bottomSheetFragment.tag)
+                            val bundle = Bundle()
+                            bundle.putString("title", resultList[position].titleText.text)
+                            bundle.putString(
+                                "year",
+                                resultList[position].releaseYear.year.toString()
+                            )
+                            bundle.putString("poster", resultList[position].primaryImage.url)
+                            parentFragmentManager.setFragmentResult("dataFromAdapter", bundle)
+                        }
+                    })
+                    filterView.layoutManager =
+                        LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+                }
             }
 
             override fun onFailure(call: Call<SearchData?>, t: Throwable) {
                 Log.d("FilterFailure:", "" + t.message)
             }
         })
+    }
+    override fun onNothingSelected(parent: AdapterView<*>?) {}
 
+    // 3 dots implementation
+    private fun showPopupMenu(view: View?){
+        val popupMenu = PopupMenu(context, view)
+        val inflater = popupMenu.menuInflater
+        inflater.inflate(R.menu.popup_menu, popupMenu.menu)
 
+        popupMenu.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener {
+            override fun onMenuItemClick(item: MenuItem?): Boolean {
+                return onPopupMenuClick(item)
+            }
+        })
+
+        popupMenu.show()
     }
 
-    override fun onNothingSelected(parent: AdapterView<*>?) {}
+    private fun onMovieSelected(){
+
+    }
+    private fun onPopupMenuClick(item: MenuItem?): Boolean {
+        when(item?.itemId){
+            R.id.signOut -> signOut()
+            R.id.about -> about()
+        }
+        return true
+    }
+
+    private fun about() {
+        val intent = Intent(context, About::class.java)
+        startActivity(intent)
+    }
+
+    private fun signOut() {
+        val sharedPreferences = requireContext().getSharedPreferences(SHARED_PREFS, AppCompatActivity.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.clear()
+        editor.apply()
+        val intent = Intent(context, Login::class.java)
+        startActivity(intent)
+    }
 }

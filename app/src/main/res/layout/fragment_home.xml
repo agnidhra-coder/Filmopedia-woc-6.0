@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/fragment_home"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Fragments.Home">
 
@@ -15,16 +16,40 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-            <TextView
-                android:layout_width="wrap_content"
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:text="@string/popular_movies"
-                android:fontFamily="@font/montserrat_bold"
-                android:textStyle="bold"
-                android:textSize="27dp"
-                style="@style/textColor"
-                />
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView"
+                    style="@style/textColor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:text="@string/popular_movies"
+                    android:textSize="27dp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageButton
+                    android:id="@+id/moreOptions"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:backgroundTint="@color/transparent"
+                    android:src="@drawable/more_1"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1"
+                    app:layout_constraintStart_toEndOf="@+id/textView"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.461" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:layout_width="match_parent"
@@ -95,6 +120,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/filterMoviesRecyclerView"/>
+
         </LinearLayout>
     </ScrollView>
 </FrameLayout>

@@ -6,6 +6,8 @@
         <item name="colorPrimaryDark">@color/white</item> <!-- used to change the color of status bar-->
         <item name="android:windowLightStatusBar">true</item> <!-- used to change the color of status bar icons to grey -->
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <item name="android:popupMenuStyle">@style/menuBackground</item>
+        <item name="android:fontFamily">@font/montserrat</item>
     </style>
 
     <style name="Theme.Filmopedia" parent="Base.Theme.Filmopedia" />
@@ -20,5 +22,8 @@
     <style name="roundedCorner">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">10dp</item>
+    </style>
+    <style name="menuBackground">
+        <item name="android:popupBackground">@drawable/menu_background</item>
     </style>
 </resources>

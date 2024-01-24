@@ -7,6 +7,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
+import androidx.fragment.app.FragmentResultListener
+import com.bumptech.glide.Glide
 import com.example.filmopedia.R
 import com.example.filmopedia.RapidAPIData.SearchData
 import com.example.filmopedia.interfaces.MovieApiInterface
@@ -24,6 +27,9 @@ class BottomSheet : BottomSheetDialogFragment() {
         .baseUrl(baseUrl)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
+    private lateinit var movieTitle : TextView
+    private lateinit var releaseYear : TextView
+    private lateinit var poster : ImageView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,21 +42,23 @@ class BottomSheet : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        posterView = view.findViewById(R.id.moviePoster)
+        parentFragmentManager.setFragmentResultListener("dataFromAdapter", this, object : FragmentResultListener {
+            override fun onFragmentResult(requestKey: String, result: Bundle) {
+                val title = result.getString("title")
+                val year = result.getString("year")
+                val posterLink = result.getString("poster")
 
-        val movieDetails = retrofitBuilder
-                        .create(MovieApiInterface::class.java)
-                        .getPopularData()
+                movieTitle = view.findViewById(R.id.bsMovieTitle)
+                releaseYear = view.findViewById(R.id.bsMovieYear)
+                poster = view.findViewById(R.id.bsMoviePoster)
 
-        movieDetails.enqueue(object : Callback<SearchData?> {
-            override fun onResponse(call: Call<SearchData?>, response: Response<SearchData?>) {
-                val responseBody = response.body()
-                val resultList = responseBody?.results!!
-
-            }
-
-            override fun onFailure(call: Call<SearchData?>, t: Throwable) {
-                Log.d("BottomSheet", "onFailure: " + t.message)
+                movieTitle.text = title
+                releaseYear.text = year
+                Glide.with(requireContext())
+                    .load(posterLink)
+                    .error(R.drawable.placeholder)
+                    .placeholder(R.drawable.placeholder)
+                    .into(poster)
             }
         })
     }

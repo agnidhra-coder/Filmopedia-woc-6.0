@@ -32,7 +32,7 @@ class MoviesAdapter(
     : RecyclerView.Adapter<MoviesAdapter.movieViewHolder>(){
 
     private lateinit var movieListener : MovieClickListener
-//    private lateinit var movieId: String
+    //    private lateinit var movieId: String
     private val mcontext:Context
     private var db = FirebaseDatabase.getInstance()
     private var dbRef = db.getReference("Favourites")
@@ -55,21 +55,7 @@ class MoviesAdapter(
 
     override fun onBindViewHolder(holder: movieViewHolder, position: Int) {
         try {
-//            val sharedPreferences = context.getSharedPreferences(BTN_CHECKED, Context.MODE_PRIVATE)
-//            val editor = sharedPreferences.edit()
-//            val checkedList = mutableListOf<String>()
-//            val wishMovies = MovieDetails().movieTitle
-//            for (movies in wishMovies!!){
-//                checkedList.add(movies)
-//            }
             val currentItem = popMoviesList[position]
-
-//            val isBtnChecked = sharedPreferences.getBoolean("checked", false)
-//            holder.wishBtn.isChecked = isBtnChecked
-
-//            if (itemStateArray.get(position, false)) {
-//                holder.wishBtn.isChecked = false
-//            }
             Log.i("delCheck", wishlist.size.toString())
             var isWishList:Boolean = false
 
@@ -94,7 +80,7 @@ class MoviesAdapter(
 
                 val randomId = popMoviesList[position].id
                 if(holder.wishBtn.isChecked){
-                    holder.wishBtn.isChecked=true
+//                    holder.wishBtn.isChecked=true
 
 
                     val movie = MovieDetails(randomId, moviePoster, movieName, releaseYear)
@@ -104,91 +90,20 @@ class MoviesAdapter(
                         holder.wishBtn.isChecked=true
                     }
                 } else{
-//                    itemStateArray.put(position, false);
-
-                    //Log.i("delCheck",wishlist.size.toString())
-                    holder.wishBtn.isChecked=false
-                    val list = arrayListOf<MovieDetails>()
-                    for(item in wishlist){
-                        if(item.id!=randomId)
-                            list.add(item)
-                        else
-                            Log.i("deleteCheck","This item was removed: ${item.id}")
+                    for((index,item) in wishlist.withIndex()){
+                        if(item.id==randomId){
+                            wishlist.removeAt(index)
+                            break
+                        }
                     }
-                    wishlist=list
-                    //Log.i("delCheck",wishlist.size.toString())
-
                     dbRef.child(uid).child(randomId).removeValue().addOnSuccessListener {
                         Toast.makeText(mcontext, "Removed from Wishlist $randomId", Toast.LENGTH_SHORT).show()
-
-                        notifyDataSetChanged()
                     }
                 }
 
 
             }
-            holder.wishBtn.setOnCheckedChangeListener { buttonView, isChecked ->
-               /* val randomId = popMoviesList[position].id
 
-                if(isChecked){
-
-
-                    val movie = MovieDetails(randomId, moviePoster, movieName, releaseYear)
-
-                    val mlist = arrayListOf<MovieDetails>()
-                    dbRef.child(uid).addValueEventListener(object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            if (context != null) {
-                                if (snapshot.exists()) {
-
-
-                                    for (movieSnapshot in snapshot.children) {
-                                        val movies =
-                                            movieSnapshot.getValue(MovieDetails::class.java)
-                                        if (movies != null) {
-                                            if (!mlist.contains(movies)) {
-                                                mlist.add(movies)
-                                            }
-                                        }
-                                    }
-                                }
-                                //here
-                                var isAdded =false
-                                for(item in mlist)
-                                {
-                                    if(item.id==movie.id)
-                                    {
-                                        isAdded=true
-                                        break
-                                    }
-                                }
-                                if(!isAdded) {
-                                    dbRef.child(uid).child(randomId).setValue(movie)
-                                        .addOnSuccessListener {
-                                            Toast.makeText(
-                                                mcontext,
-                                                "Added to Wishlist",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        }
-                                }
-                            }
-
-                        }
-
-                        override fun onCancelled(error: DatabaseError) {
-
-                        }
-                    })
-
-
-                } else{
-
-                    dbRef.child(uid).child(randomId).removeValue().addOnSuccessListener {
-                        Toast.makeText(mcontext, "Removed from Wishlist $randomId", Toast.LENGTH_SHORT).show()
-                    }
-                }*/
-            }
 
             val url = currentItem.primaryImage.url
             Glide.with(mcontext)
@@ -196,45 +111,11 @@ class MoviesAdapter(
                 .placeholder(R.drawable.placeholder)
                 .error(R.drawable.placeholder)
                 .into(holder.moviePoster)
-            
+
         } catch (e: Exception){
-//            Toast.makeText(mcontext, "No movie found", Toast.LENGTH_SHORT).show()
             {}
         }
     }
-    fun reloadWishList()
-    {
-        val mlist = arrayListOf<MovieDetails>()
-        dbRef.child(uid).addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (context != null) {
-                    if (snapshot.exists()) {
-
-
-                        for (movieSnapshot in snapshot.children) {
-                            val movies =
-                                movieSnapshot.getValue(MovieDetails::class.java)
-                            if (movies != null) {
-                                if (!mlist.contains(movies)) {
-                                    mlist.add(movies)
-                                }
-                            }
-                        }
-                    }
-                    wishlist = mlist
-
-                }
-
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-
-            }
-        })
-    }
-
-
-
 
     override fun getItemCount(): Int {
         return popMoviesList.size
@@ -243,7 +124,7 @@ class MoviesAdapter(
 
 
     class movieViewHolder(val itemView : View
-    , listener: MovieClickListener
+                          , listener: MovieClickListener
     )
         : RecyclerView.ViewHolder(itemView) {
 

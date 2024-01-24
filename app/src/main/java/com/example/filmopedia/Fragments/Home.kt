@@ -113,8 +113,6 @@ class Home : Fragment(), AdapterView.OnItemSelectedListener {
                             override fun onDataChange(snapshot: DataSnapshot) {
                                 if(context!=null){
                                 if (snapshot.exists()) {
-
-
                                     for (movieSnapshot in snapshot.children) {
                                         val movies =
                                             movieSnapshot.getValue(MovieDetails::class.java)
@@ -211,7 +209,6 @@ class Home : Fragment(), AdapterView.OnItemSelectedListener {
                             requireContext(),
                             R.layout.filter_item,
                             newList
-
                         )
                         genreDropdown.adapter = genreListAdapter
                     } else {

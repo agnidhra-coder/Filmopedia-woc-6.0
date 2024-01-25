@@ -15,9 +15,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.filmopedia.About
-import com.example.filmopedia.Adapters.MoviesAdapter
 import com.example.filmopedia.Adapters.WishlistAdapter
-import com.example.filmopedia.Adapters.movieId
 import com.example.filmopedia.Login
 import com.example.filmopedia.R
 import com.example.filmopedia.SwipeGesture

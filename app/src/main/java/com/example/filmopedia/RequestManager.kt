@@ -2,7 +2,6 @@ package com.example.filmopedia
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import com.example.filmopedia.RapidAPIData.SearchData
 import com.example.filmopedia.interfaces.SearchInterface
 import retrofit2.Call
@@ -26,14 +25,13 @@ class RequestManager(var context: Context) {
             override fun onResponse(call: Call<SearchData?>, response: Response<SearchData?>) {
                 try{
                     if(!response.isSuccessful()){
-                        Toast.makeText(context, "Couldn't fetch data", Toast.LENGTH_SHORT).show()
+                        {}
                     }
                     if(response.body()!=null) {
                         listener.onResponse(response.body())
                     }
                 }
                 catch (e: Exception){
-//                    Toast.makeText(context, "No movie found", Toast.LENGTH_SHORT).show()
                     {}
                 }
             }

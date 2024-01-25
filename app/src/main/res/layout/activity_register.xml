@@ -22,6 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15sp"
             android:fontFamily="@font/montserrat_bold"
+            android:textColor="@color/white"
             android:text="@string/register"
             android:textAlignment="textStart"
             android:textSize="25sp"
@@ -167,11 +168,13 @@
 
         <TextView
             android:id="@+id/signInText"
+            android:fontFamily="@font/montserrat"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginBottom="64dp"
             android:text="@string/sign_in"
+            android:textColor="#79A7C1"
             android:textAlignment="center"
             app:layout_constraintBottom_toBottomOf="parent"
             tools:ignore="RtlCompat"

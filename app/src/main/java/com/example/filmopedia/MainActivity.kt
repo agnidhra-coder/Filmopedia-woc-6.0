@@ -2,7 +2,6 @@ package com.example.filmopedia
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.fragment.app.Fragment
 import com.example.filmopedia.Fragments.Home
@@ -30,7 +29,6 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
-
     }
 
     private fun replaceWithFragment(frag : Fragment) {

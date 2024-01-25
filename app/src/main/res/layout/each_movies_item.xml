@@ -16,14 +16,14 @@
         android:orientation="vertical">
 
         <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/moviePoster"
             android:layout_width="150dp"
             android:layout_height="200dp"
-            android:id="@+id/moviePoster"
-            android:scaleType="centerCrop"
+            android:layout_margin="5dp"
             android:padding="5dp"
+            android:scaleType="centerCrop"
             android:src="@drawable/placeholder"
-            app:shapeAppearanceOverlay="@style/roundedCorner"
-            android:layout_margin="5dp" />
+            app:shapeAppearanceOverlay="@style/roundedCorner" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -35,29 +35,26 @@
                 android:id="@+id/movieTitle"
                 android:text="Hello World"
                 android:textSize="16dp"
-                android:fontFamily="@font/helvetica"
+                android:fontFamily="@font/montserrat"
                 android:singleLine="true"
                 android:ellipsize="marquee"
                 android:marqueeRepeatLimit="marquee_forever"
                 android:scrollHorizontally="true"
                 android:layout_margin="10dp"
+                android:textColor="@color/white"
                 android:layout_marginTop="0dp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
+
             <CheckBox
                 android:id="@+id/wishlist_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|end"
+                android:background="@color/transparent"
                 android:button="@drawable/wishlist"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="5dp"
                 />
         </LinearLayout>
-        <TextView
-            android:id="@+id/movieID"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="id"/>
     </LinearLayout>
-
 </androidx.cardview.widget.CardView>

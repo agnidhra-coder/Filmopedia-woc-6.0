@@ -15,14 +15,12 @@ import android.widget.PopupMenu
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.cardview.widget.CardView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.filmopedia.About
 import com.example.filmopedia.interfaces.MovieApiInterface
 import com.example.filmopedia.Adapters.MoviesAdapter
-import com.example.filmopedia.Adapters.WishlistAdapter
 import com.example.filmopedia.Login
 import com.example.filmopedia.R
 import com.example.filmopedia.RapidAPIData.SearchData
@@ -31,14 +29,12 @@ import com.example.filmopedia.interfaces.GenreInterface
 import com.example.filmopedia.interfaces.GenreListInterface
 import com.example.filmopedia.interfaces.MovieClickListener
 import com.example.filmopedia.wishlistData.MovieDetails
-import com.example.filmopedia.wishlistData.movieList
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.getValue
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -48,7 +44,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 @Suppress("DEPRECATION")
 class Home : Fragment(), AdapterView.OnItemSelectedListener {
 
-    lateinit var movieClickListener : MovieClickListener
     lateinit var popView: RecyclerView
     lateinit var filterView: RecyclerView
     lateinit var popMoviesAdapter: MoviesAdapter
@@ -93,89 +88,54 @@ class Home : Fragment(), AdapterView.OnItemSelectedListener {
                                 .create(MovieApiInterface::class.java)
                                 .getPopularData()
 
-        val cardView = view.findViewById<CardView>(R.id.popCardView)
-
         rapidRetrofitData.enqueue(object : Callback<SearchData?> {
             override fun onResponse(call: Call<SearchData?>, response: Response<SearchData?>) {
-                // if api call is success, use data from API in app
                 try{
-
                     if(context!=null) {
                         val responseBody = response.body()
                         val resultList = responseBody?.results!!
-
-
-                        /*dbRef.child(uid).get().addOnSuccessListener { snapshot ->
-                            val wishlist = snapshot.getValue(movieList::class.java)
-                            Log.i("Wishlist",)*/
                         val mlist = arrayListOf<MovieDetails>()
                         dbRef.child(uid).addValueEventListener(object : ValueEventListener {
                             override fun onDataChange(snapshot: DataSnapshot) {
                                 if(context!=null){
-                                if (snapshot.exists()) {
-                                    for (movieSnapshot in snapshot.children) {
-                                        val movies =
-                                            movieSnapshot.getValue(MovieDetails::class.java)
-                                        if (movies != null) {
-                                            if (!mlist.contains(movies)) {
-                                                mlist.add(movies)
+                                    if (snapshot.exists()) {
+                                        for (movieSnapshot in snapshot.children) {
+                                            val movies =
+                                                movieSnapshot.getValue(MovieDetails::class.java)
+                                            if (movies != null) {
+                                                if (!mlist.contains(movies)) {
+                                                    mlist.add(movies)
+                                                }
                                             }
                                         }
                                     }
+                                    popShimmerFrameLayout.stopShimmer()
+                                    popShimmerFrameLayout.isVisible = false
+
+                                    //recyclerview
+                                    popMoviesAdapter = MoviesAdapter(requireContext(), resultList, mlist)
+                                    popView.adapter = popMoviesAdapter
+
+                                    popMoviesAdapter.setOnMovieClickListener(object : MovieClickListener {
+                                        override fun onMovieClicked(position: Int) {
+                                            val bottomSheetFragment = BottomSheet()
+                                            bottomSheetFragment.show(fragmentManager!!, bottomSheetFragment.tag)
+                                            val bundle = Bundle()
+                                            bundle.putString("title", resultList[position].titleText.text)
+                                            bundle.putString("year", resultList[position].releaseYear.year.toString())
+                                            bundle.putString("poster", resultList[position].primaryImage.url)
+                                            parentFragmentManager.setFragmentResult("dataFromAdapter", bundle)
+                                        }
+                                    })
                                 }
-
-
-                                popShimmerFrameLayout.stopShimmer()
-                                popShimmerFrameLayout.isVisible = false
-
-                                //recyclerview
-                                popMoviesAdapter =
-                                    MoviesAdapter(requireContext(), resultList, mlist)
-                                popView.adapter = popMoviesAdapter
-
-                                popMoviesAdapter.setOnMovieClickListener(object :
-                                    MovieClickListener {
-                                    override fun onMovieClicked(position: Int) {
-                                        val bottomSheetFragment = BottomSheet()
-                                        bottomSheetFragment.show(
-                                            fragmentManager!!,
-                                            bottomSheetFragment.tag
-                                        )
-                                        val bundle = Bundle()
-                                        bundle.putString(
-                                            "title",
-                                            resultList[position].titleText.text
-                                        )
-                                        bundle.putString(
-                                            "year",
-                                            resultList[position].releaseYear.year.toString()
-                                        )
-                                        bundle.putString(
-                                            "poster",
-                                            resultList[position].primaryImage.url
-                                        )
-                                        parentFragmentManager.setFragmentResult(
-                                            "dataFromAdapter",
-                                            bundle
-                                        )
-                                    }
-                                })
-                                //here
-                            }
                             }
 
                             override fun onCancelled(error: DatabaseError) {
                                 Toast.makeText(context, error.message, Toast.LENGTH_SHORT).show()
                             }
                         })
-
-
-
-                        }
-                            popView.layoutManager =
-                                LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-
-
+                    }
+                            popView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             }
                 catch (e:Exception)
                 {
@@ -231,16 +191,11 @@ class Home : Fragment(), AdapterView.OnItemSelectedListener {
                     .create(GenreInterface::class.java)
                     .genres(genreValue)
 
-//        val filterShimmerFrameLayout = view?.findViewById<ShimmerFrameLayout>(R.id.filterShimmerView)
-//        filterShimmerFrameLayout!!.startShimmer()
-
         genre.enqueue(object : Callback<SearchData?> {
             override fun onResponse(call: Call<SearchData?>, response: Response<SearchData?>) {
-//                filterShimmerFrameLayout.stopShimmer()
-//                filterShimmerFrameLayout.isVisible = false
                 if(context!=null) {
                     val responseBody = response.body()
-                    val resultList = responseBody?.results!!
+                    var resultList = responseBody?.results!!
 
                     val moviesAdapter = MoviesAdapter(requireContext(), resultList, arrayListOf())
                     filterView.adapter = moviesAdapter
@@ -250,16 +205,16 @@ class Home : Fragment(), AdapterView.OnItemSelectedListener {
                             bottomSheetFragment.show(fragmentManager!!, bottomSheetFragment.tag)
                             val bundle = Bundle()
                             bundle.putString("title", resultList[position].titleText.text)
-                            bundle.putString(
-                                "year",
-                                resultList[position].releaseYear.year.toString()
+                            bundle.putString("year", resultList[position].releaseYear.year.toString()
                             )
+                            if (resultList[position].primaryImage.url == null){
+                                resultList[position].primaryImage.url = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlZSOLoJ-j_JMIlVZZAlQg3R6_y8Jvq4QNumJl1fbowA&s"
+                            }
                             bundle.putString("poster", resultList[position].primaryImage.url)
                             parentFragmentManager.setFragmentResult("dataFromAdapter", bundle)
                         }
                     })
-                    filterView.layoutManager =
-                        LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+                    filterView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
                 }
             }
 
@@ -281,13 +236,9 @@ class Home : Fragment(), AdapterView.OnItemSelectedListener {
                 return onPopupMenuClick(item)
             }
         })
-
         popupMenu.show()
     }
 
-    private fun onMovieSelected(){
-
-    }
     private fun onPopupMenuClick(item: MenuItem?): Boolean {
         when(item?.itemId){
             R.id.signOut -> signOut()
